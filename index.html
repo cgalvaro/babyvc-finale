@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Baby VC Finale · Comida y noche</title>
+<style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: documento de presupuesto en blanco; asistente de presupuesto arriba, carta por actos a la izquierda y la cuenta fija a la derecha (abajo en el móvil). Un solo tema claro, a propósito. Acentos: azul de trabajo y el amarillo de Baby VC. */
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --panel:#f5f8fc; --ink:#152033; --muted:#5a6578; --line:#e1e6ee; --line-strong:#c9d2df;
+  --blue:#2463b8; --blue-dark:#1b4f95; --blue-soft:#eaf1fb; --sky:#4f9cf0;
+  --yellow:#f5c330; --yellow-soft:#fff6d9; --ok:#1f7a4d; --warn:#a15a0e;
+  --serif:"IBM Plex Serif", Georgia, serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:3px;z-index:30;background:linear-gradient(90deg,var(--blue),var(--sky),var(--yellow),var(--blue));background-size:300% 100%;animation:barrido 8s linear infinite}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.2}
+p{margin:0}
+.page{max-width:1200px;margin:0 auto;padding-block:36px 140px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:40px;align-items:start}
+@media (max-width:960px){.page{grid-template-columns:minmax(0,1fr);gap:24px}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--yellow);box-shadow:0 0 0 4px var(--yellow-soft);animation:latido 2.4s ease-in-out infinite}
+
+header.cabecera{grid-column:1/-1;display:grid;gap:14px;padding:28px 24px 24px;border:1px solid var(--line);border-radius:10px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#f3f8ff 0%,#fff 55%,#fffaf0 100%)}
+header.cabecera::after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(245,195,48,.28),transparent 65%);pointer-events:none}
+header.cabecera h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.4vw,40px);position:relative}
+header.cabecera .lead{max-width:72ch;color:var(--muted);position:relative}
+.datos{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;position:relative}
+.datos span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.datos b{font-family:var(--mono);font-weight:500;color:var(--blue)}
+.comensales{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;position:relative}
+.comensales span{font-size:13px;font-weight:600}
+.comensales label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+input[type=number]{width:64px;padding:6px 8px;border:1px solid var(--line-strong);background:#fff;color:var(--ink);font:inherit;font-size:14px;text-align:center;font-variant-numeric:tabular-nums;border-radius:6px;transition:border-color .15s}
+input[type=number]:focus{border-color:var(--blue)}
+
+main{display:grid;gap:44px;min-width:0}
+
+/* Asistente */
+.asistente{border:1px solid var(--line-strong);border-radius:10px;padding:20px;display:grid;gap:16px;background:linear-gradient(135deg,var(--blue-soft),#fff 55%)}
+.asistente h2{font-family:var(--serif);font-weight:600;font-size:22px}
+.asistente .sub{font-size:13.5px;color:var(--muted);max-width:70ch}
+.modos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.modos{grid-template-columns:1fr}}
+.modo{font:inherit;text-align:left;border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:12px 14px;cursor:pointer;display:grid;gap:2px;transition:transform .15s,border-color .15s,box-shadow .15s}
+.modo:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 18px rgba(36,99,184,.12)}
+.modo b{font-size:14.5px}
+.modo span{font-family:var(--mono);font-size:18px;color:var(--blue-dark)}
+.modo small{font-size:12px;color:var(--muted)}
+.modo.activo{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,99,184,.15)}
+.modo:nth-child(2) b::after{content:" · recomendado";font-weight:400;color:var(--warn);font-size:12px}
+.barra{display:grid;gap:8px}
+.barra-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.barra-top label{font-weight:600;font-size:14px}
+.barra-top output{font-family:var(--mono);font-size:22px;color:var(--blue-dark)}
+input[type=range]{width:100%;accent-color:var(--blue);height:28px}
+.barra-lim{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.incluir{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13.5px}
+.incluir>span{font-weight:600;margin-right:4px}
+.incluir label{display:flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:#fff;border-radius:999px;padding:4px 12px;cursor:pointer}
+.incluir input{accent-color:var(--blue)}
+.resultado{display:grid;gap:6px;font-size:13.5px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.resultado div{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:10px;align-items:baseline}
+.resultado .k{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.resultado .v{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.resultado .aviso-r{color:var(--warn);display:block}
+
+.acto{display:grid;gap:14px}
+.acto-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;border-bottom:1px solid var(--line-strong);padding-bottom:10px}
+.acto-head .num{font-family:var(--mono);font-size:14px;color:#fff;background:var(--blue);width:30px;height:30px;border-radius:8px;display:inline-grid;place-items:center;align-self:center;box-shadow:3px 3px 0 var(--yellow)}
+.acto-head h2{font-family:var(--serif);font-weight:600;font-size:26px}
+.acto-head .total-acto{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--blue-dark);align-self:center}
+.acto-head .cuando{font-size:13.5px;color:var(--muted);flex-basis:100%;padding-left:44px}
+.aviso{font-size:14px;color:var(--muted);max-width:76ch}
+
+details{border:1px solid var(--line);border-radius:8px;background:#fff;transition:border-color .2s,box-shadow .2s}
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+details.grupo{border-color:var(--line-strong)}
+details.grupo>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:var(--panel);border-radius:8px}
+details.grupo[open]>summary{border-bottom:1px solid var(--line);border-radius:8px 8px 0 0}
+details.grupo>summary h3{font-size:17px;font-weight:600}
+.chev{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font-size:12px;color:var(--blue);transition:transform .2s}
+details[open]>summary .chev{transform:rotate(180deg)}
+.grupo-body{display:grid;gap:10px;padding:12px}
+details[open]>.grupo-body,details[open]>.casa-body{animation:aparecer .25s ease-out}
+.cuenta-grupo{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+details.casa>summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 14px;align-items:center;padding:12px 14px}
+details.casa:hover{border-color:var(--line-strong)}
+details.casa[open]>summary{border-bottom:1px solid var(--line)}
+.casa-nombre{font-weight:600;font-size:15.5px}
+.casa-sub{grid-column:1;font-size:13px;color:var(--muted)}
+.desde{font-size:13px;color:var(--muted);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.desde b{color:var(--ink);font-weight:600}
+.casa.tiene-sel{border-color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.casa.tiene-sel .casa-nombre::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yellow);margin-left:8px;vertical-align:2px}
+.casa-body{padding:12px 14px 4px;display:grid;gap:10px}
+.fichas{display:flex;flex-wrap:wrap;gap:6px}
+.ficha{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.ficha.ok{border-color:#bfe0cf;background:#eef8f2;color:var(--ok)}
+.ficha.warn{border-color:#f0d6b5;background:#fdf5ea;color:var(--warn)}
+.contacto{font-size:13px;color:var(--muted)}
+.contacto a{font-weight:500}
+
+.plato{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:12px 0;border-top:1px solid var(--line);transition:background-color .25s}
+.plato .tit{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-width:0}
+.plato .tit b{font-weight:600}
+.plato .tit a.prod{font-size:12.5px}
+.plato .precio{text-align:right;font-family:var(--mono);font-weight:500;white-space:nowrap}
+.plato .precio small{display:block;font-family:var(--sans);font-size:11.5px;color:var(--muted)}
+.plato .desc{font-size:13.5px;color:var(--muted);max-width:80ch}
+.plato .accion{display:flex;gap:8px;align-items:center;justify-content:end;align-self:end}
+.plato.sel{background:var(--blue-soft);margin-inline:-14px;padding-inline:14px;border-top-color:#cfdcf0}
+.btn{font:inherit;font-size:13px;font-weight:600;padding:6px 14px;border:1px solid var(--blue);background:#fff;color:var(--blue);cursor:pointer;border-radius:6px;white-space:nowrap;transition:background-color .15s,transform .1s}
+.btn:hover{background:var(--blue-soft)}
+.btn:active{transform:scale(.96)}
+.plato.sel .btn{background:var(--blue);color:#fff}
+.qty-wrap{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+
+.cuenta{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);border:1px solid var(--line-strong);background:#fff;border-radius:10px;padding:20px;display:grid;gap:14px;box-shadow:0 10px 30px rgba(21,32,51,.08);overflow:hidden}
+.cuenta::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--blue),var(--sky) 70%,var(--yellow))}
+.cuenta{position:sticky}
+.cuenta h2{font-family:var(--serif);font-weight:600;font-size:20px}
+.lineas{display:grid;gap:8px}
+.linea{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;font-size:14px;font-variant-numeric:tabular-nums}
+.linea span:first-child{color:var(--muted)}
+.linea .v{font-family:var(--mono)}
+.linea .bar{grid-column:1/-1;height:4px;border-radius:4px;background:var(--panel);overflow:hidden}
+.linea .bar i{display:block;height:100%;background:var(--blue);border-radius:4px;transition:width .4s ease}
+.linea:nth-child(2) .bar i{background:var(--sky)}
+.linea:nth-child(3) .bar i{background:var(--yellow)}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line-strong);padding-top:12px}
+.total span{font-weight:600}
+.total b{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--blue-dark);font-variant-numeric:tabular-nums}
+.total b.pulso{animation:pulso .45s ease-out}
+.sel-list{font-size:12.5px;display:grid;gap:6px;max-height:240px;overflow:auto;border-top:1px solid var(--line);padding-top:10px}
+.sel-list div{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
+.sel-list div span:first-child{color:var(--muted)}
+.sel-list div span:last-child{font-family:var(--mono)}
+.pie{font-size:12px;color:var(--muted);display:grid;gap:4px}
+.aviso-iva{color:var(--warn);font-weight:600}
+.cuenta .acciones{display:flex;gap:8px;flex-wrap:wrap}
+.cuenta .acciones button{font:inherit;font-size:12.5px;padding:6px 10px;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:6px;cursor:pointer}
+.cuenta .acciones button:hover{border-color:var(--blue);color:var(--blue)}
+.cab-cuenta{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.extra{display:grid;gap:12px}
+@media (min-width:961px){#ver-detalle{display:none}}
+@media (max-width:960px){
+  .cuenta{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;border-radius:0;border-inline:0;border-bottom:0;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:8px;max-height:82vh;overflow:auto;box-shadow:0 -8px 24px rgba(21,32,51,.12)}
+  .cuenta .extra{display:none}
+  .cuenta.abierta .extra{display:grid}
+  .total b{font-size:24px}
+  details.casa>summary{grid-template-columns:minmax(0,1fr) auto}
+  details.casa>summary .desde{grid-column:1;text-align:left}
+  .resultado div{grid-template-columns:80px minmax(0,1fr)}
+  .resultado .v{grid-column:2}
+}
+footer{grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px;display:grid;gap:6px;font-size:12.5px;color:var(--muted);max-width:90ch}
+/* Resaltado de lo elegido */
+details.grupo.tiene-sel{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,99,184,.10)}
+details.grupo.tiene-sel>summary{background:linear-gradient(90deg,#dce9fa,var(--blue-soft) 60%,var(--panel))}
+details.grupo.tiene-sel>summary h3::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--yellow);margin-right:10px;vertical-align:2px}
+details.casa.tiene-sel>summary{background:var(--blue-soft)}
+.badge-sel{font-family:var(--mono);font-size:11.5px;background:var(--blue);color:#fff;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.badge-sel[hidden]{display:none}
+.acto.tiene-sel .acto-head{border-bottom-color:var(--blue)}
+.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(245,195,48,.9)}40%{box-shadow:0 0 0 8px rgba(245,195,48,.35)}100%{box-shadow:0 0 0 0 rgba(245,195,48,0)}}
+/* Opciones del presupuesto */
+.opciones{display:grid;gap:10px}
+.opciones h3{font-size:14px;font-weight:600}
+.opciones-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.op-acto{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:4px;align-content:start;max-height:360px;overflow:auto}
+.op-acto h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.op-acto h4 span{font-family:var(--mono);text-transform:none;letter-spacing:0;color:var(--blue-dark)}
+.op{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;font-size:13px;padding:6px 0;border-top:1px dashed var(--line)}
+.op .n{min-width:0}
+.op .c{font-family:var(--mono);font-size:12.5px;white-space:nowrap;text-align:right}
+.op .ac{grid-column:1/-1;display:flex;gap:12px;font-size:12.5px}
+.op .ac button{font:inherit;font-size:12.5px;background:none;border:0;padding:0;color:var(--blue);cursor:pointer;font-weight:600}
+.op .ac button:hover{text-decoration:underline}
+.op.actual{background:var(--yellow-soft);margin-inline:-12px;padding-inline:12px}
+.op-vacio{font-size:13px;color:var(--warn)}
+/* Fondo de red en la cabecera */
+#red{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+header.cabecera>*:not(#red){position:relative;z-index:1}
+@keyframes barrido{to{background-position:300% 0}}
+@keyframes latido{50%{box-shadow:0 0 0 7px rgba(245,195,48,.15)}}
+@keyframes aparecer{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes pulso{0%{color:var(--sky);transform:scale(1.04)}100%{color:var(--blue-dark);transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="page">
+  <header class="cabecera">
+    <canvas id="red" aria-hidden="true"></canvas>
+    <span class="eyebrow">Baby VC Iberia · Bootcamp Finale · Sábado 21.11.2026</span>
+    <h1>Comida, catering y noche</h1>
+    <p class="lead">Elige un presupuesto con el asistente o abre cada sitio y añade productos a mano. La cuenta se calcula sola con el precio que publica cada casa, leído en sus webs y en Glovo el 2 de noviembre.</p>
+    <div class="datos">
+      <span><b>14:00</b> Comida · Cloudworks, Castellana 86</span>
+      <span><b>19:15</b> Networking · Valdebebas</span>
+      <span><b>23:30</b> Copas</span>
+    </div>
+    <div class="comensales" role="group" aria-label="Número de personas">
+      <span>Personas</span>
+      <label for="p-comida">Comida <input id="p-comida" type="number" min="1" value="55"></label>
+      <label for="p-networking">Networking <input id="p-networking" type="number" min="1" value="100"></label>
+    </div>
+  </header>
+
+  <main id="carta">
+    <section class="asistente" aria-labelledby="t-asistente">
+      <div><h2 id="t-asistente">Asistente de presupuesto</h2><p class="sub">Marca qué paga el presupuesto y elige una opción, o mueve la barra: se marca una comida y un networking completos para todos, con bebida donde hace falta. Lo que no marques se queda vacío. Luego puedes cambiar lo que quieras a mano. La noche no entra porque la paga cada uno.</p></div>
+      <div class="incluir" role="group" aria-label="Qué entra en el presupuesto"><span>Qué paga el presupuesto</span>
+        <label><input type="checkbox" id="inc-comida" checked> Comida</label>
+        <label><input type="checkbox" id="inc-networking" checked> Networking</label>
+      </div>
+      <div class="modos">
+        <button type="button" class="modo" data-modo="min"><b>Mínimo</b><span id="m-min">—</span><small id="m-min-d"></small></button>
+        <button type="button" class="modo" data-modo="eq"><b>Equilibrado</b><span id="m-eq">—</span><small id="m-eq-d"></small></button>
+        <button type="button" class="modo" data-modo="max"><b>Máximo</b><span id="m-max">—</span><small id="m-max-d"></small></button>
+      </div>
+      <div class="barra">
+        <div class="barra-top"><label for="presu">Presupuesto total que tenemos</label><output id="presu-v" for="presu">—</output></div>
+        <input type="range" id="presu" step="10">
+        <div class="barra-lim"><span id="presu-min"></span><span id="presu-max"></span></div>
+      </div>
+      <div class="resultado" id="resultado" aria-live="polite"></div>
+      <div class="opciones" id="opciones"></div>
+    </section>
+    <div id="actos" style="display:grid;gap:44px"></div>
+  </main>
+
+  <aside class="cuenta" id="cuenta" aria-live="polite">
+    <div class="cab-cuenta"><h2>Presupuesto</h2><button type="button" class="btn" id="ver-detalle">Ver detalle</button></div>
+    <div class="lineas extra" id="lineas"></div>
+    <div class="total"><span>Total con IVA</span><b id="total">0 €</b></div>
+    <div class="extra">
+      <div class="linea"><span>Por fellow (51)</span><span class="v" id="por-fellow">0 €</span></div>
+      <div class="linea"><span>Noche, por persona</span><span class="v" id="noche-pp">—</span></div>
+      <div class="sel-list" id="sel-list"></div>
+      <div class="pie">
+        <p>Se suma el 10 % de IVA donde la casa lo da aparte. <span id="flag-iva"></span></p>
+        <p>Los 1.000 € de Acurio VC son el premio del Challenge y no entran aquí.</p>
+      </div>
+      <div class="acciones"><button type="button" id="copiar">Copiar resumen</button><button type="button" id="limpiar">Vaciar</button></div>
+    </div>
+  </aside>
+
+  <footer>
+    <p>Fuentes: la web de cada casa, enlazada en cada sitio y en cada producto; las tiendas de Glovo Madrid para Goiko, Vicio, Five Guys, Honest Greens, Poke House y Taco Bell (Glovo no tiene página por producto, así que el enlace lleva a la tienda); la <a href="https://danielaguileraicai.github.io/babyvc-ic-weekend/" target="_blank" rel="noopener">guía de Daniel</a>, Grupo La Facultad y webs de reservas para la noche; Salir.com, La Gastrónoma y VenuesPlace para los menús de grupo.</p>
+    <p>Los precios de Glovo son los de un pedido normal en la app; para 55 personas hay que llamar al local. Los precios «desde» son el mínimo que publica la casa.</p>
+  </footer>
+</div>
+
+<script>
+const IVA = 0.10;
+// u: "persona" (1 por persona o 1 cada `cada`), "pack" (para `pack` personas), "fijo" (una vez)
+// iva: "incl" incluido, "mas" +10 %, "nd" la casa no lo dice
+const GLOVO = "Glovo no tiene página por producto: el enlace abre la tienda.";
+const CARTA = [
+ { id:"comida", num:"01", titulo:"Comida", cuando:"14:00 · Cloudworks, Paseo de la Castellana 86 · una caja por persona", personas:"p-comida",
+   aviso:"Para comer en el cowork. Lo primero es preguntar a cada casa si sirve el sábado 21.",
+   grupos:[
+   { titulo:"Cajas de catering", casas:[
+     { nombre:"Doña Col", sub:"Catering Box® Lunch, con menaje desechable", url:"https://donacol.es/caterings-boxes-madrid-zaragoza/catering-box-lunch/",
+       fichas:[["Mínimo 10 cajas"],["Precios + IVA 10 %"],["Sábado: preguntar","warn"]], contacto:"919 379 872 · infomadrid@donacol.es · C/ Nestares 10, Madrid",
+       nota:"Las seis cajas están en la misma página de su web.", platos:[
+       {id:"dc1",n:"Catering Box Lunch 1",p:13.90,iva:"mas",u:"persona",d:"Surtido de quesos con galletitas rellenas de queso de cabra, nueces, pasas y pan soplado; bocatín de lechuga, huevo duro, tomate, atún y salsa ligera; bocatín de jamón ibérico con tomate y AOVE; bocatín de tortilla de patata; empanada de bonito; empanada de york y queso; croqueta de cocido; croqueta de jamón; bolita de queso azul."},
+       {id:"dc2",n:"Catering Box Lunch 2",p:13.90,iva:"mas",u:"persona",d:"Montadito de jamón ibérico con tomate y AOVE; taquitos de tortilla de patata; empanada de york y queso; mini hamburguesa con cebolla caramelizada, mostaza de Dijon y canónigos; bocatín vegetal; croqueta de cocido; croqueta de jamón; bolita de queso azul; cola de langostino crujiente; cremosa de boletus a la trufa."},
+       {id:"dc3",n:"Catering Box Lunch 3",p:15.90,iva:"mas",u:"persona",d:"Surtido de quesos con galletitas; mini hamburguesa con cebolla caramelizada, Dijon y canónigos; bocatín de tortilla de patata; empanada de york y queso; empanada de bonito; croquetas de cocido y de jamón; bolita de ajoarriero; bolita de queso azul; cola de langostino crujiente; cremosa de boletus a la trufa."},
+       {id:"dc4",n:"Catering Box Lunch 4",p:16.90,iva:"mas",u:"persona",d:"Surtido de quesos con galletitas; chorizo, salchichón y caña de lomo ibéricos D.O. Guijuelo con panes; montadito de jamón ibérico con tomate y AOVE; taquitos de tortilla; empanada de bonito; croquetas de cocido y de jamón; bolita de ajoarriero; bolita de queso azul; cola de langostino crujiente; cremosa de boletus a la trufa."},
+       {id:"dc5",n:"Catering Box Lunch 5",p:19.90,iva:"mas",u:"persona",d:"Envoltini de papada ibérica D.O. Guijuelo; caña de lomo ibérico con pan soplado; bocatín de lechuga, tomate, huevo duro, atún y salsa ligera; brioche de jamón ibérico con tomate y AOVE; bocatín de tortilla; empanada de bonito; empanada de york, crema de queso y emmental; croquetas de cocido y de jamón; bolita de queso azul."},
+       {id:"dc6",n:"Catering Box Lunch 6",p:21.90,iva:"mas",u:"persona",d:"Surtido de quesos con galletitas; chorizo, salchichón y caña de lomo ibéricos D.O. Guijuelo con panes; montadito de jamón ibérico; brioche de lechuga, tomate, huevo duro, atún y salsa ligera; empanada de bonito; croquetas de cocido y de jamón; bolita de ajoarriero; bolita de queso azul; langostino crujiente; cremosa de boletus a la trufa; bizcocho de limón; brownie."} ]},
+     { nombre:"Factory Events", sub:"Box lunch con entrega, personal y menaje", url:"https://factoryevents.es/catering-madrid/box-lunch/",
+       fichas:[["Mínimo 10 cajas"],["Pedir con 48 h"],["Entrega en Madrid incluida","ok"],["Bebida incluida","ok"],["Precios + IVA 10 %"]], contacto:"960 65 30 61 · info@factoryevents.es",
+       nota:"Dietas vegana, vegetariana, sin gluten, sin lactosa y halal sin coste extra.", platos:[
+       {id:"fe1",n:"Box lunch Express",p:13.50,iva:"mas",u:"persona",d:"Ensalada de temporada (hojas tiernas, cherry, aguacate y vinagreta de cítricos); bocadillo de masa madre de jamón ibérico, queso curado o vegetal, a elegir; brownie de chocolate belga y nueces; fruta de temporada cortada; refresco y agua mineral."},
+       {id:"fe2",n:"Box lunch Ejecutivo",p:17,iva:"mas",u:"persona",d:"Ensalada de rulo de cabra con nueces, manzana y vinagreta de miel; tortilla de patata con cebolla; wrap de pollo crujiente con lechuga, tomate y salsa César; tarta de queso cremosa; fruta de temporada cortada; refresco y agua mineral."} ]},
+     { nombre:"DeCuatro", sub:"#FOODBOXLUNCH: eliges ensalada o sándwich, postre y bebida", url:"https://decuatrocatering.com/categoria-producto/foodbox/",
+       fichas:[["Mínimo 10"],["Precios sin IVA"],["Bebida incluida","ok"],["Entrega M-30: 15 €"]], contacto:"915 35 63 65 · info@decuatrocatering.com · C/ Adela Balboa 3, Madrid",
+       nota:"Castellana 86 está dentro de la M-30.", platos:[
+       {id:"d4a",n:"#FOODBOXLUNCH",p:13.50,iva:"mas",u:"persona",url:"https://decuatrocatering.com/catering/foodbox/foodboxlunch/",d:"Ensalada (lentejas con huevo y ventresca; quinoa con frutos secos y calabaza; pasta al pesto; poke de arroz jazmín con salmón; poke de noodles con pollo teriyaki; poke de noodles de arroz con brócoli) o sándwich (pastrami con pepinillos; roastbeef con rúcula; club de pollo y bacon; salmón y aguacate; huevo, bacon y cheddar; mortadela trufada y mozzarella), más postre (fruta, cheesecake, mousse de mango, brownie, tarta de manzana o de zanahoria) y bebida. Con cubiertos."},
+       {id:"d4t",n:"Entrega dentro de la M-30",p:15,iva:"mas",u:"fijo",url:"https://decuatrocatering.com/catering/foodbox/foodboxlunch/",d:"Tarifa de transporte de su web."} ]}
+   ]},
+   { titulo:"Hamburgueserías", casas:[
+     { nombre:"Goiko", sub:"Menús con patatas, bebida y salsa", url:"https://glovoapp.com/es/es/madrid/stores/goiko-madrid",
+       fichas:[["Precio Glovo, IVA incl.","ok"],["Para 55: llamar al local"]], contacto:"Carta: goiko.com/es/carta",
+       nota:GLOVO, platos:[
+       {id:"go1",n:"Menú Retro",p:17.90,iva:"incl",u:"persona",url:"https://www.goiko.com/es/plato/retro/",d:"Carne, queso, cebolla morada a la plancha, tomate, lechuga batavia, pepinillos, salsa Barbacoa Goiko y Mayo Goiko. Con patatas, bebida y salsa Barbacoa."},
+       {id:"go2",n:"Menú Kevin Bacon",p:17.90,iva:"incl",u:"persona",url:"https://www.goiko.com/es/plato/kevin-bacon/",d:"Su hamburguesa más vendida: carne picada en la plancha mezclada con trozos de bacon, cebolla crunchy y queso. Con patatas, bebida y salsa Barbacoa."},
+       {id:"go3",n:"Menú Kevin Costner",p:20.90,iva:"incl",u:"persona",url:"https://www.goiko.com/es/plato/hamburguesa-kevin-costner/",d:"La Kevin (carne, bacon bits, cebolla crunchy y queso) con costilla desmenuzada y salsa barbacoa. Con patatas y bebida."},
+       {id:"go4",n:"Menú Kevin Bacon sin gluten",p:18.90,iva:"incl",u:"persona",url:"https://glovoapp.com/hr/es/madrid/stores/goiko-100-gluten-free-madrid",d:"La misma Kevin Bacon en el Goiko 100 % sin gluten, con patatas, bebida y salsa Barbacoa."} ]},
+     { nombre:"Vicio", sub:"Smash burgers en pan brioche", url:"https://glovoapp.com/es/es/madrid/stores/vicio-madrid",
+       fichas:[["Precio Glovo, IVA incl.","ok"],["Para 55: llamar al local"]], contacto:"Carta: vicio.com",
+       nota:"Se les puede proponer una colaboración a cambio de que salga su marca.", platos:[
+       {id:"vi1",n:"Satisfayer",p:15.90,iva:"incl",u:"persona",d:"Combo de Glovo: 1 burger, 1 acompañamiento y 1 bebida."},
+       {id:"vi2",n:"Cheeseburger",p:10.90,iva:"incl",u:"persona",url:"https://vicio.com/product/cheeseburger",d:"Doble smash, cheddar, pepinillos y salsa VICIO en pan brioche."},
+       {id:"vi3",n:"Bacon Cheeseburger",p:11.90,iva:"incl",u:"persona",url:"https://vicio.com/product/bacon-cheeseburger",d:"Doble smash con bacon crunchy, cheddar, pepinillos y salsa VICIO en pan brioche."},
+       {id:"vi5",n:"VICIO Originals",p:11.90,iva:"incl",u:"persona",url:"https://vicio.com/product/vicio-originals",d:"Doble smash, lechuga francesa, tomate pera, cheddar, pepinillos y salsa VICIO en pan brioche."},
+       {id:"vi6",n:"BBQ Bacon Cheeseburger",p:12.90,iva:"incl",u:"persona",url:"https://vicio.com/product/bbq-bacon-cheeseburger",d:"Doble smash, bacon crunchy, cheddar, pepinillos y salsa BBQ casera en pan brioche."},
+       {id:"vi4",n:"VICIO Fries",p:3.90,iva:"incl",u:"persona",url:"https://vicio.com/product/vicio-fries",d:"Patatas fritas con sal especiada."} ]},
+     { nombre:"Five Guys", sub:"Hamburguesa, patatas y bebida se piden por separado", url:"https://glovoapp.com/ca/es/madrid/stores/five-guys-madrid",
+       fichas:[["Precio Glovo, IVA incl.","ok"],["Para 55: llamar al local"]], contacto:"Carta: fiveguys.es/menu",
+       nota:GLOVO, platos:[
+       {id:"fg1",n:"Hamburguesa con queso",p:13.45,iva:"incl",u:"persona",url:"https://www.fiveguys.es/menu/menu-de-hamburguesas-hamburguesas-hamburguesas-con-queso-y-mas/",d:"Dos porciones de carne hechas a mano con queso americano derretido, en pan tostado de sésamo, con los aderezos que quieras."},
+       {id:"fg2",n:"Hamburguesa",p:11.95,iva:"incl",u:"persona",url:"https://www.fiveguys.es/menu/menu-de-hamburguesas-hamburguesas-hamburguesas-con-queso-y-mas/",d:"Dos porciones de carne hechas a mano en pan tostado de sésamo, con los aderezos que quieras."},
+       {id:"fg3",n:"Patatas Estilo Five Guys, grandes",p:7.25,iva:"incl",u:"persona",cada:2,url:"https://www.fiveguys.es/menu/menu-de-patatas-fritas-patatas-fritas-clasicas-o-picantes-cajun/",d:"Patatas cortadas a mano y fritas en aceite de cacahuete, ligeramente saladas. Calculado 1 ración grande para cada 2 personas."},
+       {id:"fg4",n:"Coca-Cola 500 ml",p:3.25,iva:"incl",u:"persona",d:"Botella de 500 ml."} ]},
+     { nombre:"Juancho's BBQ", sub:"Carta de noviembre de 2026, con patatas caseras", url:"https://juanchosbbq.com/carta-general/",
+       fichas:[["Precio de carta, IVA incl.","ok"],["Tienen sociedad de catering"]], contacto:"Pedir presupuesto de grupo en juanchosbbq.com",
+       nota:"Su web no tiene página por producto: el enlace abre la carta.", platos:[
+       {id:"jb1",n:"La Bacon Juancheeseburger",p:16.90,iva:"incl",u:"persona",d:"Carne de vaca de La Finca, cheddar fundido, panceta ibérica macerada al cubata, barbacoa y patatas fritas caseras en aceite de oliva."},
+       {id:"jb2",n:"La BLT",p:16.90,iva:"incl",u:"persona",d:"Burger de pollo a la parrilla con panceta ibérica al cubata, cheddar fundido, lechuga, tomate, cebolla fresca y salsa smoked mayo, con patatas fritas en aceite de oliva."},
+       {id:"jb3",n:"La Vegeta",p:16.90,iva:"incl",u:"persona",d:"Ovolactovegetariana: burger Heura con tomate, cebolla dulce, lechuga, cheddar fundido y smoked mayo, con patatas cortadas a mano."} ]}
+   ]},
+   { titulo:"Bowls y burritos", casas:[
+     { nombre:"Honest Greens", sub:"Bowls y market plates", url:"https://glovoapp.com/hr/es/madrid/stores/honest-greens",
+       fichas:[["Precio Glovo, IVA incl.","ok"],["Catering en packs aparte"]], contacto:"catering@honestgreens.com · hello@honestgreens.com",
+       nota:GLOVO, platos:[
+       {id:"hg1",n:"Spicy Feta Bowl",p:10.45,iva:"incl",u:"persona",d:"Feta, aguacate, hummus, kale, maíz, pepino, manzana, edamame, quinoa, garbanzos, salsa tali y hot honey, cebolla, hierbas, patata, avellana, sumac y granada."},
+       {id:"hg2",n:"Truffle Mushroom Bowl",p:10.45,iva:"incl",u:"persona",d:"Setas asadas, quinoa, lentejas, edamame, kale, calabaza, tirabeques, uvas y lombarda encurtidas, cherry, granada, mayo de trufa, aliño de yuzu koji, avellanas y dukkah."},
+       {id:"hg3",n:"Latin Lover",p:10.45,iva:"incl",u:"persona",d:"Arroz integral, alubias, kale, col, maíz, cebolla, aguacate, pepino, ají, tajín, jalapeños, pico de gallo y crème fraîche vegetal de anacardo con almendra."},
+       {id:"hg4",n:"Pollo con Limón y Mostaza",p:10.25,iva:"incl",u:"persona",d:"Pechuga de pollo con certificado de bienestar animal, marinada de hierbas, salsa de limón y mostaza, sal de limón y pimienta."} ]},
+     { nombre:"Poke House", sub:"Poke bowls", url:"https://glovoapp.com/es/es/madrid/stores/poke-house-madrid",
+       fichas:[["Precio Glovo, IVA incl.","ok"],["Algunos con 2x1 en la app"]], contacto:"",
+       nota:GLOVO, platos:[
+       {id:"ph1",n:"Chicken Teriyaki",p:11.90,iva:"incl",u:"persona",d:"Arroz blanco, pollo teriyaki con jengibre, calabacín, cherry, col lombarda, salsa teriyaki, spicy mayo, almendras y sésamo."},
+       {id:"ph2",n:"Sunny Salmon",p:11.90,iva:"incl",u:"persona",d:"Arroz blanco, salmón, aguacate, edamame, col lombarda, ponzu, crema de aguacate y sésamo."},
+       {id:"ph3",n:"Chicken Teriyaki Combo Menu",p:15.40,iva:"incl",u:"persona",d:"El Chicken Teriyaki en tamaño medium con la bebida que elijas."} ]},
+     { nombre:"Taco Bell", sub:"Menús con nachos, patatas o ensalada y bebida", url:"https://glovoapp.com/eu/es/madrid/stores/taco-bell-mad2",
+       fichas:[["Precio Glovo, IVA incl.","ok"]], contacto:"",
+       nota:GLOVO, platos:[
+       {id:"tb1",n:"Menú Burrito XL",p:12.95,iva:"incl",u:"persona",d:"Burrito extragrande de carne picada, patatas mexican, guacamole, tomate, salsa creamy jalapeño, nata agria y tres quesos, con nachos, patatas o ensalada y bebida."},
+       {id:"tb2",n:"Menú Chicken Burrito",p:11.90,iva:"incl",u:"persona",d:"Burrito de pollo crujiente, ligeramente picante, con nachos, patatas o ensalada y bebida."},
+       {id:"tb3",n:"Menú Burrito Bowl Mexican",p:11.80,iva:"incl",u:"persona",d:"Arroz mexican, frijoles negros, lechuga, pico de gallo, cheddar, nata agria, carne a elegir (o veggie) y salsa mexican, con nachos, patatas o ensalada y bebida."} ]}
+   ]},
+   { titulo:"Bebida", casas:[
+     { nombre:"Compra en el súper", sub:"Si la caja no lleva bebida", url:"",
+       fichas:[["Estimación propia","warn"]], contacto:"", nota:"No es un precio de una web: agua y refrescos comprados el viernes.", platos:[
+       {id:"bs1",n:"Agua y refrescos",p:1,iva:"incl",u:"persona",d:"Calculado a 1 € por persona."} ]}
+   ]}
+ ]},
+ { id:"networking", num:"02", titulo:"Networking", cuando:"19:15–20:30 · Calle Estanislao Pérez Pita 23, Valdebebas (28055) · picoteo de pie", personas:"p-networking",
+   aviso:"Tope: 25 € por persona (20 € es lo que propone Dani, unos 2.000 € para 100). Aquí solo está lo que cumple ese tope. Hay dos formatos: cóctel con camareros, que sirven y montan, o picoteo en bandejas listas para la zona de catering de la sala, con entrega a las 18:30.",
+   grupos:[
+   { titulo:"Cóctel con camareros", casas:[
+     { nombre:"Goblin Catering", sub:"Vino español con camareros uniformados, menaje y cristalería", url:"https://www.goblincatering.com/madrid/cocktails-goblin-catering.pdf",
+       fichas:[["Camareros incluidos","ok"],["Bebida incluida","ok"],["Mínimo 45 personas"],["Dura 1 hora"],["Transporte aparte"],["IVA no indicado","warn"]], contacto:"910 169 338 · 695 581 020 · eventos@goblincatering.com",
+       nota:"Carta de cócteles 2026. Bebida en todos: agua, refrescos, cerveza con y sin alcohol, tinto Rioja crianza y blanco Rueda. Media hora extra con bebida: 3,50 € por persona. Montan 2 horas antes.", platos:[
+       {id:"gv1",n:"Vino Español 1",p:20,iva:"nd",u:"persona",d:"Rueda de ibéricos con picos de Jerez, fuente de quesos variados con uvas y tortilla española en daditos."},
+       {id:"gv2",n:"Vino Español 2",p:22,iva:"nd",u:"persona",d:"Ibéricos con picos, quesos con uvas, tostita de foie con arándanos, perlas de mozzarella con cherry, tortilla en daditos y tartaleta de salmorejo con jamón y huevo."},
+       {id:"gv3",n:"Vino Español 3",p:25,iva:"nd",u:"persona",d:"Vasito de consomé o gazpacho, ibéricos con picos, quesos con uvas, popis de cabra con quicos y frambuesa, tartaleta de salmorejo, cazuelita de ensaladilla, flautita tex-mex con guacamole y tortilla en daditos."} ]},
+     { nombre:"Catering Domenico", sub:"Cóctel con barra libre y bartenders", url:"https://cateringdomenico.com/cocteles/",
+       fichas:[["Bebida incluida","ok"],["Bartenders","ok"],["Precios + IVA 10 %"],["Oficina de lunes a viernes: confirmar sábado","warn"]], contacto:"91 535 08 90 · eventos@cdomenico.com · C/ Simancas 21 (Plaza de Castilla)",
+       nota:"Presupuesto cerrado en menos de 24 h. Bebida: agua, refrescos, cerveza con y sin alcohol, tinto y blanco. Los aperitivos se eligen de su carta en PDF.", platos:[
+       {id:"dv1",n:"Vino Español",p:23.20,iva:"mas",u:"persona",d:"Pizarras de jamón ibérico 100 % D.O. Guijuelo, quesos artesanos variados y bebidas."},
+       {id:"dv2",n:"Aperitivo",p:24.90,iva:"mas",u:"persona",d:"4 aperitivos a elegir, postre y bebidas."} ]},
+     { nombre:"Catergest", sub:"El de Grupo SEK: comedores de colegios y empresas, desde 1962", url:"https://www.catergest.com/servicios/empresa/",
+       fichas:[["Sin precios publicados","warn"]], contacto:"610 171 266 · 91 661 66 50 · catering@catergest.com · Alcobendas",
+       nota:"Su web dice que hacen «cócteles, lunch, desayunos y comidas especiales para reuniones de trabajo, eventos y celebraciones de empresa», pero no publica menús ni precios: hay que pedir presupuesto.", platos:[] }
+   ]},
+   { titulo:"Picoteo por persona, sin camareros", casas:[
+     { nombre:"Do Meigo", sub:"Restaurante gallego en Sanchinarro, al lado de Valdebebas", url:"https://restaurantesdomeigo.es/catering/",
+       fichas:[["IVA incluido","ok"],["Mínimo 12"],["Pedir con 1 semana"],["Reserva del 20 %"]], contacto:"912 434 243 · 605 365 730 · eventos@domeigo.es",
+       nota:"Su web no detalla qué piezas lleva: hay que pedir la propuesta.", platos:[
+       {id:"dmg1",n:"Picoteo gallego",p:18,iva:"incl",u:"persona",d:"Seis referencias por persona, listo para servir. Sin bebida."} ]},
+     { nombre:"La Frolita", sub:"Cócteles básicos en bandejas, sin camareros", url:"https://lafrolita.es/nuestros-servicios/cocteles-basicos/",
+       fichas:[["Precios + IVA 10 %"],["Mínimo 20"],["Pedir con 72 h"],["Entrega hasta las 20:00"],["Portes: 0,45 €/km fuera de la M-30"]], contacto:"lafrolita.es",
+       nota:"Piezas de su carta como mini-burger con barbacoa y queso, mini-bretzel de salmón, serrano o pollo, brocheta de pollo teriyaki, empanada de atún, pincho de tortilla, brocheta de mozzarella y tomate seco y mini-brownie. Bandejas de un solo uso.", platos:[
+       {id:"lb1",n:"Party",p:14,iva:"mas",u:"persona",d:"Picoteo: 11 piezas por persona."},
+       {id:"lb2",n:"Party luxe",p:16,iva:"mas",u:"persona",d:"Comida o cena de picoteo: 13 piezas por persona."},
+       {id:"lb5",n:"Menú frío Gourmet",p:16,iva:"mas",u:"persona",d:"12 piezas frías por persona."},
+       {id:"lb3",n:"Gold",p:19,iva:"mas",u:"persona",d:"Muy abundante: 16 piezas por persona."},
+       {id:"lb4",n:"Gold Premium",p:21,iva:"mas",u:"persona",d:"Muy abundante: 18 piezas por persona."} ]},
+     { nombre:"DeCuatro", sub:"Bandejas de picoteo por persona", url:"https://decuatrocatering.com/categoria-producto/foodbox/",
+       fichas:[["Precios sin IVA"],["Mínimo 10"],["Transporte M-30: 10 €"]], contacto:"915 35 63 65 · info@decuatrocatering.com",
+       nota:"Su web da el número de bocados pero no cuáles son. Venden cerveza y refresco a 1,50 € la unidad.", platos:[
+       {id:"d4e",n:"#ElEconomico",p:18.50,iva:"mas",u:"persona",url:"https://decuatrocatering.com/catering/foodbox/eleconomico/",d:"12 bocados por persona: 6 referencias saladas y 2 dulces."} ]}
+   ]},
+   { titulo:"Packs para grupo", casas:[
+     { nombre:"La Emilita", sub:"Packs de bandejas frías", url:"https://laemilita.es/categoria-producto/catering/packs-catering-grupos/",
+       fichas:[["Sin mínimo"],["Sábados solo de 9:00 a 13:00","warn"],["IVA no indicado","warn"]], contacto:"91 037 40 30 · pedidos@laemilita.es",
+       nota:"Un sábado llegaría por la mañana y habría que guardarlo en frío hasta las 19:00. Para 85: pack de 70–75 + pack de 10–12.", platos:[
+       {id:"le75",n:"Pack Catering 70–75 personas",p:660,iva:"nd",u:"pack",pack:75,url:"https://laemilita.es/producto/pack-catering-70-75-personas/",d:"2 dados de empanada de atún y 1 de carne (25 uds), 3 tortillas, 2 mini medias noches (30), 4 mini bagels (14), 3 mini wraps (18), 3 mini croissants de jamón y tomate (16), 3 mini croissants gourmet (12), 2 mini sándwiches premium (24), 3 brochetas de cherry y mozzarella (15), 2 tartaletas y rollitos (35), 3 tablas de quesos y 2 de pasteles."},
+       {id:"le55",n:"Pack Catering 50–55 personas",p:475,iva:"nd",u:"pack",pack:55,url:"https://laemilita.es/producto/pack-catering-50-55-personas/",d:"Dados de empanada de atún y de carne (25), 2 tortillas, 2 medias noches (16), 3 mini wraps (18), 2 mini croissants de jamón y tomate (16), 2 mini croissants gourmet (12), 2 mini sándwiches premium (24), tartaletas y rollitos (35), canapés gourmet (32), 2 tablas de quesos, 2 tablas de jamón ibérico de 200 g y 2 de pasteles."},
+       {id:"le35",n:"Pack Catering 30–35 personas",p:250,iva:"nd",u:"pack",pack:35,url:"https://laemilita.es/producto/pack-catering-30-35-personas/",d:"Dados de empanada de atún (25), mini medias noches (30), 2 mini wraps (18), 2 mini croissants de jamón y tomate (16), mini sándwiches premium (24), 2 brochetas de pollo y verduras (12), tartaletas y rollitos (35), 2 tortillas y pasteles variados."},
+       {id:"le12",n:"Pack Catering 10–12 personas",p:120,iva:"nd",u:"pack",pack:12,url:"https://laemilita.es/producto/pack-catering-bandejas/",d:"Mini wraps (18), mini croissants premium (15), mini sándwiches premium (24), tabla de quesos con nueces y frutos rojos, pulgas y brioches, emilitos surtidos (24) y una tortilla."} ]},
+     { nombre:"Desayunos con Encanto", sub:"El obrador que sirve los packs de Paradise, con compra directa en su web", url:"https://cateringconencanto.com/catering-para-empresas-y-particulares/",
+       fichas:[["Compra directa con carrito","ok"],["Obrador abre sábados de 9:00 a 14:00","warn"],["IVA no indicado","warn"]], contacto:"662 369 418 · 655 920 056 (también WhatsApp) · Fuenlabrada",
+       nota:"Hay que confirmar si entregan un sábado por la tarde o si lo traen antes de las 14:00.", platos:[
+       {id:"ce24",n:"Picoteo para 24",p:249,iva:"nd",u:"pack",pack:24,url:"https://cateringconencanto.com/picoteo-para-24",d:"170 bocados: 24 mini hamburguesas (ternera con cebolla caramelizada y pollo barbacoa), 24 croissants rellenos (pavo y aguacate, pastrami, cangrejo), 24 chapatinas (pollo y jamón con tomate), 24 blinis de salmón, 2 bandejas de ibéricos, 2 tortillas, 24 croquetas (jamón, boletus, gambón) y 24 sándwiches gourmet."},
+       {id:"ce12",n:"Picoteo para 12",p:156,iva:"nd",u:"pack",pack:12,url:"https://cateringconencanto.com/picoteo-para-12",d:"108 bocados, 12 de cada: chapatinas de pastrami, blinis de mousse de ibérico, croissants de pavo y aguacate, brochetas de salmón y mozzarella, hamburguesitas de pollo, tortillitas de trufa, cremositos de salmorejo, croquetas (jamón y gambón) y bombones de foie."},
+       {id:"ceg",n:"Catering Gourmet",p:499,iva:"nd",u:"pack",pack:24,url:"https://cateringconencanto.com/catering-gourmet_2",d:"Para 24, 316 piezas y quesos: salmorejo, moneditas de foie, blinis de salmón, brochetas de pastrami, wraps, bretzels, tartaletas, croquetas de boletus y gambón, bombones de cabra, cachopitos, 2 tablas de quesos, mini tortillitas, 12 vasitos dulces y 24 dulces."} ]},
+     { nombre:"Viena Capellanes", sub:"Packs de picoteo del obrador madrileño", url:"https://www.vienacapellanes.com/especial-packs-picoteos",
+       fichas:[["IVA incluido","ok"],["Compra directa con cesta","ok"],["Portes aparte"]], contacto:"915 398 353 · encargos@vienacapellanes.com",
+       nota:"Su web solo dice para cuántos es el Picoteo Rebel. Pequeños bocados está calculado a 8 piezas por persona, y Picoteo Viena para 12.", platos:[
+       {id:"vc1",n:"Picoteo Rebel",p:163.20,iva:"incl",u:"pack",pack:11,url:"https://www.vienacapellanes.com/picoteo-rebel",d:"86 piezas para 10–12 personas: conos de ibéricos (10), focaccia de atún, piquillo y maíz (12), torta de Aranda con tortilla (16), rolls salados (12) y rueda de salmón ahumado con guacamole."},
+       {id:"vcv",n:"Picoteo Viena",p:195.30,iva:"incl",u:"pack",pack:12,url:"https://www.vienacapellanes.com/picoteo-viena",d:"Mini hamburguesas surtidas (12), rueda de quesos gallegos de 500 g, dados de empanada surtida (12), 2 tortas de Aranda triple de pavo y 15 espetos de pollo con dos salsas."},
+       {id:"vc4",n:"Picoteo pequeños bocados",p:143.10,iva:"incl",u:"pack",pack:8,url:"https://www.vienacapellanes.com/picoteo-pequenos-bocados",d:"63 piezas: micromolletes (12), brochetas saladas (12), jamón ibérico de cebo 300 g, pops de foie y manzana (12), enrolladitos (15) y medias noches (12)."},
+       {id:"vc2",n:"Colocación",p:9,iva:"incl",u:"fijo",url:"https://www.vienacapellanes.com/colocacion",d:"Colocan el pedido y retiran el embalaje."},
+       {id:"vc3",n:"Pack de 12 cervezas Mahou 5 Estrellas",p:19.20,iva:"incl",u:"pack",pack:6,url:"https://www.vienacapellanes.com/pack-de-12-cervezas-mahou-5-estrellas",d:"Calculado a 2 cervezas por persona."} ]}
+   ]},
+   { titulo:"Bebida", casas:[
+     { nombre:"Compra en el súper", sub:"Si el picoteo no la lleva", url:"",
+       fichas:[["Estimación propia","warn"]], contacto:"", nota:"No es un precio de una web: agua, refrescos y cerveza comprados el viernes.", platos:[
+       {id:"bn1",n:"Agua, refrescos y cerveza",p:2.5,iva:"incl",u:"persona",d:"Calculado a 2,50 € por persona."} ]}
+   ]}
+ ]}
+];
+
+// Planes completos para el asistente: cada uno da de comer a todo el acto. {id: cantidad fija} o null para la cantidad automática.
+const PLANES = {
+ comida:[
+  {dc1:null,bs1:null},{dc2:null,bs1:null},{dc3:null,bs1:null},{dc4:null,bs1:null},{dc5:null,bs1:null},{dc6:null,bs1:null},
+  {fe1:null},{fe2:null},{d4a:null,d4t:null},
+  {go1:null},{go2:null},{go3:null},{vi1:null},{fg1:null,fg3:null,fg4:null},{jb1:null,bs1:null},
+  {hg1:null,bs1:null},{ph3:null},{tb1:null},{tb2:null},{tb3:null} ],
+ networking:[
+  {gv1:null},{gv2:null},{gv3:null},{dv1:null},{dv2:null},
+  {lb1:null,bn1:null},{lb2:null,bn1:null},{lb3:null,bn1:null},{lb4:null,bn1:null},
+  {dmg1:null,bn1:null},{d4e:null,bn1:null},
+  {le75:1,le12:1,bn1:null},{ce24:null,bn1:null},{ce12:null,bn1:null},{ceg:null,bn1:null},
+  {vc1:null,vc2:null,vc3:null,bn1:null},{vcv:null,vc2:null,vc3:null,bn1:null} ]
+};
+
+// e: entrada [mín, máx]; c: copa [mín, máx]; 0 = libre
+const NOCHE = [
+ { titulo:"Bares de copas", sitios:[
+   {n:"Maná Maldonado",z:"Maldonado 55 · Salamanca",url:"https://grupolafacultad.com/bar-mana-maldonado-55/",d:"Bar de copas del Grupo La Facultad. Los precios publicados son los de la cadena (en su local de Juan Bravo): cañas y botellines desde 1 €, promoción «Copas 3x» por 13 € y cerveza doble a 1 € de 19:00 a 24:00. Hacen eventos privados con zona para grupos: reservas en el 652 206 061 o reservas@grupolafacultad.com.",e:[0,0],c:[4.35,5]},
+   {n:"Mamá no lo sabe",z:"Castelló 117 · Salamanca",url:"https://danielaguileraicai.github.io/babyvc-ic-weekend/",d:"Bar de copas. Jueves a sábado de 23:00 a 3:30.",e:[0,0],c:[9,11]},
+   {n:"Maloney's",z:"Bretón de los Herreros 61 · Chamberí",url:"https://danielaguileraicai.github.io/babyvc-ic-weekend/",d:"Pub irlandés. Pinta a 4,50 €, a 3 € de 21:00 a 23:00. Sábado hasta las 3:30.",e:[0,0],c:[4.5,4.5]} ]},
+ { titulo:"Clubs de la zona pija", sitios:[
+   {n:"Gabana",z:"María de Molina 39 · El Viso",url:"https://discotecasgratis.com/discotecas/gabana-music-club",d:"Anticipada 15–22 €, en puerta 20–30 €. Mesa VIP desde 150 € para 5 los miércoles.",e:[15,30],c:[12,15]},
+   {n:"Commodoro",z:"Joaquín Costa 29 · El Viso",url:"https://discotecasgratis.com/discotecas/Discoteca-Commodoro",d:"Anticipada 12–15 € con una copa; en puerta 15–20 €. Mesa desde 150 € para 5 con botella: para 50 serían unas 10 mesas.",e:[12,20],c:[10,12]},
+   {n:"Saint Club",z:"Velázquez 64 · Salamanca",url:"https://danielaguileraicai.github.io/babyvc-ic-weekend/",d:"Lista gratis o anticipada 12–18 € con bebida. Jueves a sábado de 0:00 a 6:00. Precio de copa no publicado.",e:[0,18],c:null},
+   {n:"Fitz Club",z:"Princesa 1 · Plaza de España",url:"https://www.discoruta.com/discotecas/fitz-club-madrid/",d:"Anticipada 10 € con 1 copa o 15 € con 2; en puerta 12–15 € con 1. Mesa VIP desde 250 €.",e:[10,15],c:null},
+   {n:"Jimmy's",z:"María de Molina 39 · El Viso",url:"https://danielaguileraicai.github.io/babyvc-ic-weekend/",d:"Restaurante con ambiente de club junto a Gabana, de 21:00 a 1:00. Cena de unos 100 € por persona.",e:[0,0],c:null},
+   {n:"Teatro Kapital",z:"Atocha 125",url:"https://danielaguileraicai.github.io/babyvc-ic-weekend/",d:"Siete plantas con músicas distintas. Entrada con bebidas incluidas.",e:[21,35],c:null} ]}
+];
+
+const fmt = n => n.toLocaleString("es-ES",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0 = n => n.toLocaleString("es-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0});
+const rango = (a,b) => a===b ? fmt(a) : `${fmt(a)} – ${fmt(b)}`;
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const ext = (url, texto, cls) => `<a ${cls?`class="${cls}"`:""} href="${url}" target="_blank" rel="noopener">${texto}</a>`;
+const chev = `<span class="chev" aria-hidden="true">▾</span>`;
+const NOMBRES = {comida:"Comida", networking:"Networking"};
+
+let estado = {sel:{}, noche:null, presu:null};
+try{ const g = JSON.parse(localStorage.getItem("babyvc-carta-v5")||"null"); if(g && g.sel) estado = g; }catch(e){}
+const guardar = () => { try{ localStorage.setItem("babyvc-carta-v5", JSON.stringify(estado)); }catch(e){} };
+
+const platos = {};
+const slug = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+CARTA.forEach(a => a.grupos.forEach(g => g.casas.forEach(c => { c.idCasa = 'casa-'+slug(a.id+' '+c.nombre); c.platos.forEach(p => { platos[p.id] = {...p, casa:c.nombre, acto:a.id, personas:a.personas, casaId:c.idCasa}; }); })));
+const gente = id => Math.max(1, parseInt(document.getElementById(id).value,10)||1);
+const cantidadPorDefecto = p => p.u==="fijo" ? 1 : p.u==="pack" ? Math.ceil(gente(p.personas)/p.pack) : Math.ceil(gente(p.personas)/(p.cada||1));
+const cantidadDe = (p, sel) => sel[p.id]==null ? cantidadPorDefecto(p) : sel[p.id];
+const cantidad = p => cantidadDe(p, estado.sel);
+const unitario = p => p.iva==="mas" ? p.p*(1+IVA) : p.p;
+const coste = p => unitario(p)*cantidad(p);
+const etIva = p => p.iva==="mas" ? "+ IVA 10 %" : p.iva==="nd" ? "IVA no indicado" : "IVA incluido";
+const etUnidad = p => p.u==="pack" ? "por pack" : p.u==="fijo" ? "una vez" : p.cada ? "por ración" : "por persona";
+
+// --- Asistente ---
+const costePlan = plan => Object.keys(plan).reduce((s,id) => s + unitario(platos[id]) * cantidadDe(platos[id], plan), 0);
+const nombrePlan = plan => { const ids = Object.keys(plan).filter(id => !["bs1","bn1","d4t","vc2","vc3","fg3","fg4"].includes(id)); const p = platos[ids[0]]; return `${p.casa} · ${p.n}`; };
+function planesOrdenados(){ const r = {}; for(const k in PLANES) r[k] = PLANES[k].map(pl => ({pl, c:costePlan(pl)})).sort((a,b) => a.c-b.c); return r; }
+function combo(elegidos){ return {partes:elegidos, total:elegidos.reduce((s,x)=>s+x.c,0)}; }
+const actosIncluidos = () => ["comida","networking"].filter(k => document.getElementById("inc-"+k).checked);
+function calcularModos(){
+  const o = planesOrdenados(), k = actosIncluidos();
+  const min = combo(k.map(x => o[x][0])), max = combo(k.map(x => o[x][o[x].length-1]));
+  const eq = combo(k.map(x => o[x][Math.floor((o[x].length-1)/2)]));
+  return {o, min, max, eq};
+}
+function mejorBajo(o, tope){
+  // la combinación más completa que cabe en el presupuesto
+  let mejor = null; const k = actosIncluidos();
+  const buscar = (i, partes, t) => {
+    if(i===k.length){ if(!mejor || t>mejor.total) mejor = combo(partes); return; }
+    for(const x of o[k[i]]){ if(t+x.c>tope) break; buscar(i+1, [...partes, x], t+x.c); }
+  };
+  buscar(0, [], 0);
+  return mejor;
+}
+function aplicar(cmb){
+  const nuevo = {};
+  // la noche no está en estado.sel; las tres comidas se sustituyen enteras
+  cmb.partes.forEach(x => Object.assign(nuevo, x.pl));
+  estado.sel = nuevo;
+}
+function pintarResultado(cmb, aviso){
+  const k = actosIncluidos();
+  if(!k.length){ document.getElementById("resultado").innerHTML = `<span class="aviso-r">Marca al menos una cosa para que el asistente proponga algo.</span>`; return; }
+  document.getElementById("resultado").innerHTML = (aviso?`<span class="aviso-r">${aviso}</span>`:"") +
+    cmb.partes.map((x,i) => `<div><span class="k">${NOMBRES[k[i]]}</span><span>${esc(nombrePlan(x.pl))}</span><span class="v">${fmt0(x.c)}</span></div>`).join("") +
+    `<div><span class="k">Total</span><span></span><span class="v"><b>${fmt0(cmb.total)}</b></span></div>`;
+}
+function pintarAsistente(){
+  const m = calcularModos();
+  const vacio = !actosIncluidos().length;
+  document.querySelectorAll(".modo").forEach(b => b.disabled = vacio);
+  document.getElementById("presu").disabled = vacio;
+  if(vacio){ ["min","eq","max"].forEach(k => { document.getElementById("m-"+k).textContent = "—"; document.getElementById("m-"+k+"-d").textContent = ""; }); return m; }
+  [["min",m.min],["eq",m.eq],["max",m.max]].forEach(([k,c]) => {
+    document.getElementById("m-"+k).textContent = fmt0(c.total);
+    document.getElementById("m-"+k+"-d").textContent = c.partes.map(x => nombrePlan(x.pl).split(" · ")[0]).join(" + ");
+  });
+  const r = document.getElementById("presu");
+  const lo = Math.floor(m.min.total/10)*10, hi = Math.ceil(m.max.total/10)*10;
+  r.min = Math.min(500, lo); r.max = Math.max(hi, +r.min+10);
+  if(estado.presu==null || estado.presu>+r.max || estado.presu<+r.min) estado.presu = Math.round(m.eq.total/10)*10;
+  r.value = estado.presu;
+  document.getElementById("presu-min").textContent = fmt0(+r.min);
+  document.getElementById("presu-max").textContent = fmt0(+r.max);
+  document.getElementById("presu-v").textContent = fmt0(+r.value);
+  return m;
+}
+function porPresupuesto(){
+  const m = calcularModos(), tope = +document.getElementById("presu").value;
+  estado.presu = tope;
+  document.getElementById("presu-v").textContent = fmt0(tope);
+  const c = mejorBajo(m.o, tope);
+  pintarOpcionesTrasCambio = () => pintarOpciones(tope);
+  if(c){ aplicar(c); pintarResultado(c); }
+  else { aplicar(m.min); pintarResultado(m.min, `Con ${fmt0(tope)} no llega para lo que has marcado: esto es lo mínimo posible.`); }
+  document.querySelectorAll(".modo").forEach(b => b.classList.remove("activo"));
+  pintarCuenta();
+}
+
+const principal = pl => Object.keys(pl).find(id => !["bs1","bn1","d4t","vc2","vc3","fg3","fg4"].includes(id));
+function aplicarPlanActo(acto, pl){
+  Object.keys(estado.sel).forEach(id => { if(platos[id] && platos[id].acto===acto) delete estado.sel[id]; });
+  Object.assign(estado.sel, pl);
+}
+function pintarOpciones(tope){
+  const caja = document.getElementById("opciones"), k = actosIncluidos();
+  if(!k.length || tope==null){ caja.innerHTML = ""; return; }
+  const o = planesOrdenados();
+  const minimo = x => o[x][0].c;
+  const minTotal = k.reduce((s,x) => s+minimo(x), 0), juntas = tope >= minTotal;
+  caja.innerHTML = (juntas
+    ? `<h3>Con ${fmt0(tope)}, esto es lo que cabe en cada parte</h3>
+       <p style="font-size:12.5px;color:var(--muted)">Cada lista cuenta con lo más barato en las otras partes marcadas. «Elegir» lo pone en la cuenta y «Ver en la carta» te lleva al sitio.</p>`
+    : `<h3>Con ${fmt0(tope)} no llega para ${k.length>1?"todo lo marcado junto":"esta parte"} (mínimo ${fmt0(minTotal)})</h3>
+       <p style="font-size:12.5px;color:var(--muted)">Esto es lo que se podría pagar de cada parte por separado con ese dinero. «Elegir» lo pone en la cuenta y «Ver en la carta» te lleva al sitio.</p>`)
+    + `<div class="opciones-grid">${k.map(acto => {
+      const margen = juntas ? tope - k.filter(x => x!==acto).reduce((s,x) => s+minimo(x), 0) : tope;
+      // las 4 opciones más completas que caben
+      const caben = o[acto].map((x,i) => ({...x,i})).filter(x => x.c<=margen).reverse().slice(0,4);
+      const actual = Object.keys(estado.sel).filter(id => platos[id]?.acto===acto).sort().join();
+      return `<div class="op-acto"><h4>${NOMBRES[acto]} <span>hasta ${fmt0(Math.max(0,margen))}</span></h4>${
+        caben.length ? caben.map(x => {
+          const id = principal(x.pl), p = platos[id];
+          const es = Object.keys(x.pl).sort().join()===actual;
+          return `<div class="op${es?" actual":""}"><span class="n"><b>${esc(p.casa)}</b> · ${esc(p.n)}</span><span class="c">${fmt0(x.c)}</span>
+            <span class="ac"><button type="button" data-elegir="${acto}|${x.i}">${es?"Elegido":"Elegir"}</button><button type="button" data-ir="${p.casaId}">Ver en la carta ↓</button></span></div>`;
+        }).join("") : `<p class="op-vacio">No cabe nada con este presupuesto.</p>`
+      }</div>`;
+    }).join("")}</div>`;
+}
+function abrirCasa(id){
+  const d = document.getElementById(id); if(!d) return;
+  d.closest("details.grupo").open = true; d.open = true;
+  d.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+  d.classList.remove("flash"); void d.offsetWidth; d.classList.add("flash");
+}
+let pintarOpcionesTrasCambio = () => {};
+
+// --- Carta ---
+function pintarCarta(){
+  document.getElementById("actos").innerHTML = CARTA.map(a => `
+   <section class="acto" id="${a.id}">
+     <div class="acto-head"><span class="num">${a.num}</span><h2>${a.titulo}</h2><span class="total-acto" id="t-${a.id}"></span><span class="cuando">${a.cuando}</span></div>
+     <p class="aviso">${a.aviso}</p>
+     ${a.grupos.map((g,gi) => `
+       <details class="grupo" ${gi===0?"open":""}>
+         <summary><h3>${g.titulo}</h3><span style="display:flex;gap:12px;align-items:center"><span class="badge-sel" hidden></span><span class="cuenta-grupo">${g.casas.length} ${g.casas.length===1?"sitio":"sitios"}</span>${chev}</span></summary>
+         <div class="grupo-body">${g.casas.map(c => {
+           const precios = c.platos.filter(p=>p.u!=="fijo").map(p=>p.p);
+           const resumen = precios.length ? `${c.platos.length} ${c.platos.length===1?"producto":"productos"} · <b>${rango(Math.min(...precios),Math.max(...precios))}</b>` : `<b>Pedir presupuesto</b>`;
+           return `
+           <details class="casa" data-casa="1" id="${c.idCasa}">
+             <summary>
+               <span class="casa-nombre">${c.nombre}</span>
+               <span class="desde">${resumen}</span>
+               ${chev}
+               <span class="casa-sub">${c.sub}</span>
+             </summary>
+             <div class="casa-body">
+               <div class="fichas">${c.fichas.map(f=>`<span class="ficha ${f[1]||""}">${f[0]}</span>`).join("")}</div>
+               ${c.nota?`<p class="contacto">${c.nota}</p>`:""}
+               ${(c.contacto||c.url)?`<p class="contacto">${c.contacto}${c.contacto&&c.url?" · ":""}${c.url?ext(c.url,"Abrir su web ↗"):""}</p>`:""}
+               <div>${c.platos.map(p => `
+                 <div class="plato" data-id="${p.id}">
+                   <div class="tit"><b>${p.n}</b>${(p.url||c.url)?ext(p.url||c.url, p.url?"Ver producto ↗":"Ver en la tienda ↗","prod"):""}</div>
+                   <div class="precio">${fmt(p.p)}<small>${etUnidad(p)} · ${etIva(p)}</small></div>
+                   <p class="desc">${p.d}</p>
+                   <div class="accion"><span class="qty-wrap" hidden><label for="q-${p.id}">Cant.</label><input id="q-${p.id}" class="qty" type="number" min="0"></span><button type="button" class="btn">Añadir</button></div>
+                 </div>`).join("")}</div>
+             </div>
+           </details>`;}).join("")}</div>
+       </details>`).join("")}
+   </section>`).join("") + `
+   <section class="acto" id="noche">
+     <div class="acto-head"><span class="num">03</span><h2>Noche</h2><span class="cuando">Después de cenar · Salamanca, El Viso y Chamberí</span></div>
+     <p class="aviso">Lo paga cada uno, así que no suma al presupuesto. Elige un sitio y la cuenta muestra lo que cuesta por persona con la entrada y dos copas. Para un grupo de 50, escribid al local o al relaciones públicas un par de días antes. Los precios de los clubs salen de webs de reservas y de la guía de Daniel, y cambian según la noche.</p>
+     ${NOCHE.map(g => `
+       <details class="grupo" open>
+         <summary><h3>${g.titulo}</h3><span style="display:flex;gap:12px;align-items:center"><span class="badge-sel" hidden></span><span class="cuenta-grupo">${g.sitios.length} ${g.sitios.length===1?"sitio":"sitios"}</span>${chev}</span></summary>
+         <div class="grupo-body">${g.sitios.map(s => `
+           <details class="casa" data-noche="${esc(s.n)}">
+             <summary>
+               <span class="casa-nombre">${s.n}</span>
+               <span class="desde">Entrada <b>${s.e[1]===0?"libre":s.e[0]===0?"lista o hasta "+s.e[1]+" €":s.e[0]+"–"+s.e[1]+" €"}</b> · Copa <b>${s.c?(s.c[0]===s.c[1]?fmt(s.c[0]):fmt(s.c[0])+"–"+fmt(s.c[1])):"no publicada"}</b></span>
+               ${chev}
+               <span class="casa-sub">${s.z}</span>
+             </summary>
+             <div class="casa-body">
+               <p class="contacto">${s.d}</p>
+               <div class="plato" data-noche="${esc(s.n)}" style="border-top:0;padding-top:0">
+                 <div class="tit">${ext(s.url,"Ver fuente ↗","prod")}</div>
+                 <div class="accion"><button type="button" class="btn">Elegir</button></div>
+               </div>
+             </div>
+           </details>`).join("")}</div>
+       </details>`).join("")}
+   </section>`;
+}
+
+let ultimoTotal = null;
+function pintarCuenta(){
+  document.querySelectorAll(".plato[data-id]").forEach(el => {
+    const p = platos[el.dataset.id], on = p.id in estado.sel, q = el.querySelector(".qty");
+    el.classList.toggle("sel", on);
+    el.querySelector(".qty-wrap").hidden = !on;
+    if(on && document.activeElement!==q) q.value = cantidad(p);
+    el.querySelector(".btn").textContent = on ? "Quitar" : "Añadir";
+  });
+  document.querySelectorAll("details.casa[data-casa]").forEach(d => d.classList.toggle("tiene-sel", !!d.querySelector(".plato.sel")));
+  document.querySelectorAll(".plato[data-noche]").forEach(el => {
+    const on = estado.noche===el.dataset.noche;
+    el.querySelector(".btn").textContent = on ? "Elegido" : "Elegir";
+    el.closest("details.casa").classList.toggle("tiene-sel", on);
+  });
+  document.querySelectorAll("details.grupo").forEach(g => {
+    const n = g.querySelectorAll("details.casa.tiene-sel").length, b = g.querySelector(".badge-sel");
+    g.classList.toggle("tiene-sel", n>0);
+    b.hidden = !n; b.textContent = n===1 ? "1 elegido" : n+" elegidos";
+  });
+  document.querySelectorAll("section.acto").forEach(a => a.classList.toggle("tiene-sel", !!a.querySelector("details.casa.tiene-sel")));
+  const porActo = {comida:0, networking:0};
+  let sinIva = 0; const filas = [];
+  Object.keys(estado.sel).forEach(id => { const p = platos[id]; if(!p) return; const c = coste(p); porActo[p.acto]+=c; if(p.iva==="nd") sinIva++; filas.push([`${cantidad(p)} × ${p.casa} · ${p.n}`, c, p.acto]); });
+  const total = porActo.comida+porActo.networking;
+  document.getElementById("lineas").innerHTML = Object.keys(porActo).map(k => `<div class="linea"><span>${NOMBRES[k]}</span><span class="v">${fmt0(porActo[k])}</span><span class="bar"><i style="width:${total?Math.round(porActo[k]/total*100):0}%"></i></span></div>`).join("");
+  Object.keys(porActo).forEach(k => { const t = document.getElementById("t-"+k); if(t) t.textContent = porActo[k] ? fmt0(porActo[k]) : ""; });
+  const tot = document.getElementById("total");
+  tot.textContent = fmt0(total);
+  if(ultimoTotal!==null && ultimoTotal!==Math.round(total)){ tot.classList.remove("pulso"); void tot.offsetWidth; tot.classList.add("pulso"); }
+  ultimoTotal = Math.round(total);
+  document.getElementById("por-fellow").textContent = fmt0(total/51);
+  document.getElementById("sel-list").innerHTML = filas.map(f => `<div><span>${esc(f[0])}</span><span>${fmt0(f[1])}</span></div>`).join("") || "<div><span>Nada elegido todavía</span></div>";
+  document.getElementById("flag-iva").innerHTML = sinIva ? `<span class="aviso-iva">${sinIva} ${sinIva===1?"producto no dice":"productos no dicen"} si lleva IVA.</span>` : "";
+  let pp = "—";
+  const s = NOCHE.flatMap(g => g.sitios).find(x => x.n===estado.noche);
+  if(s){ const c = s.c || [10,14]; const min = s.e[0]+2*c[0], max = s.e[1]+2*c[1]; pp = (Math.round(min)===Math.round(max) ? fmt0(min) : `${Math.round(min)}–${Math.round(max)} €`) + (s.c ? "" : " (copa estimada)"); }
+  document.getElementById("noche-pp").textContent = pp;
+  guardar();
+  pintarOpcionesTrasCambio();
+  return {porActo,total,filas,pp,s};
+}
+
+// --- Arranque ---
+pintarCarta();
+const modos = pintarAsistente();
+if(!Object.keys(estado.sel).length && estado.noche==null){ aplicar(modos.eq); estado.noche = "Maná Maldonado"; document.querySelector('.modo[data-modo="eq"]').classList.add("activo"); pintarResultado(modos.eq); }
+else document.getElementById("resultado").innerHTML = `<span class="muted" style="color:var(--muted)">Elige una opción o mueve la barra para que el asistente proponga una combinación.</span>`;
+pintarOpcionesTrasCambio = () => pintarOpciones(estado.presu);
+pintarCuenta();
+
+document.querySelectorAll(".modo").forEach(b => b.addEventListener("click", () => {
+  const m = calcularModos(), c = m[b.dataset.modo];
+  aplicar(c); pintarResultado(c);
+  estado.presu = Math.round(c.total/10)*10; document.getElementById("presu").value = estado.presu; document.getElementById("presu-v").textContent = fmt0(estado.presu);
+  document.querySelectorAll(".modo").forEach(x => x.classList.toggle("activo", x===b));
+  pintarOpcionesTrasCambio = () => pintarOpciones(estado.presu);
+  pintarCuenta();
+}));
+document.getElementById("presu").addEventListener("input", porPresupuesto);
+document.getElementById("opciones").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.ir) abrirCasa(b.dataset.ir);
+  if(b.dataset.elegir){ const [acto,i] = b.dataset.elegir.split("|"); aplicarPlanActo(acto, planesOrdenados()[acto][+i].pl); document.querySelectorAll(".modo").forEach(x => x.classList.remove("activo")); pintarCuenta(); }
+});
+document.querySelectorAll(".incluir input").forEach(i => i.addEventListener("change", () => { estado.presu = null; pintarAsistente(); if(actosIncluidos().length) porPresupuesto(); else { estado.sel = {}; pintarResultado(null); pintarCuenta(); } }));
+const actos = document.getElementById("actos");
+actos.addEventListener("click", e => {
+  const b = e.target.closest(".btn"); if(!b) return;
+  const el = b.closest(".plato");
+  if(el.dataset.id){ const id = el.dataset.id; if(id in estado.sel) delete estado.sel[id]; else estado.sel[id] = null; }
+  else estado.noche = estado.noche===el.dataset.noche ? null : el.dataset.noche;
+  document.querySelectorAll(".modo").forEach(x => x.classList.remove("activo"));
+  pintarCuenta();
+});
+actos.addEventListener("input", e => {
+  if(!e.target.classList.contains("qty")) return;
+  const id = e.target.closest(".plato").dataset.id, v = parseInt(e.target.value,10);
+  estado.sel[id] = isNaN(v) ? null : Math.max(0,v); pintarCuenta();
+});
+document.querySelectorAll(".comensales input").forEach(i => i.addEventListener("input", () => {
+  // al cambiar el número de personas, las cantidades y el asistente se recalculan
+  Object.keys(estado.sel).forEach(id => { if(platos[id] && platos[id].u!=="fijo") estado.sel[id] = null; });
+  estado.presu = null; pintarAsistente(); pintarCuenta();
+}));
+document.getElementById("limpiar").addEventListener("click", () => { estado = {sel:{}, noche:null, presu:estado.presu}; document.querySelectorAll(".modo").forEach(x => x.classList.remove("activo")); pintarCuenta(); });
+document.getElementById("ver-detalle").addEventListener("click", e => { const c = document.getElementById("cuenta"); c.classList.toggle("abierta"); e.target.textContent = c.classList.contains("abierta") ? "Cerrar" : "Ver detalle"; });
+document.getElementById("copiar").addEventListener("click", async e => {
+  const r = pintarCuenta();
+  const txt = ["Presupuesto Baby VC Finale (21-nov)",
+    ...["comida","networking"].map(k => `\n${NOMBRES[k]}: ${fmt0(r.porActo[k])}\n` + r.filas.filter(f=>f[2]===k).map(f=>`- ${f[0]}: ${fmt0(f[1])}`).join("\n")),
+    `\nTotal con IVA: ${fmt0(r.total)} (${fmt0(r.total/51)} por fellow)`,
+    r.s ? `Noche: ${r.s.n}, ${r.pp} por persona (paga cada uno)` : ""].join("\n");
+  try{ await navigator.clipboard.writeText(txt); e.target.textContent = "Copiado"; }catch(err){ e.target.textContent = "No se pudo copiar"; }
+  setTimeout(() => e.target.textContent = "Copiar resumen", 1800);
+});
+
+// --- Fondo: red de nodos en la cabecera ---
+(() => {
+  const cv = document.getElementById("red"), cx = cv.getContext("2d"), cab = cv.parentElement;
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w, h, nodos = [];
+  const medir = () => {
+    const r = cab.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio||1);
+    w = r.width; h = r.height; cv.width = w*dpr; cv.height = h*dpr; cx.setTransform(dpr,0,0,dpr,0,0);
+    const n = Math.round(Math.min(70, w*h/9000));
+    nodos = Array.from({length:n}, (_,i) => ({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25, r: i%9===0 ? 3 : 1.6, am: i%9===0}));
+  };
+  const dibujar = () => {
+    cx.clearRect(0,0,w,h);
+    for(let i=0;i<nodos.length;i++){ const a = nodos[i];
+      for(let j=i+1;j<nodos.length;j++){ const b = nodos[j], d = Math.hypot(a.x-b.x, a.y-b.y);
+        if(d<120){ cx.strokeStyle = "rgba(36,99,184," + ((1-d/120)*.22) + ")"; cx.lineWidth = 1; cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y); cx.stroke(); } } }
+    nodos.forEach(n => { cx.fillStyle = n.am ? "rgba(245,195,48,.9)" : "rgba(36,99,184,.45)"; cx.beginPath(); cx.arc(n.x,n.y,n.r,0,Math.PI*2); cx.fill(); });
+  };
+  const paso = () => {
+    nodos.forEach(n => { n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>w) n.vx*=-1; if(n.y<0||n.y>h) n.vy*=-1; });
+    dibujar(); requestAnimationFrame(paso);
+  };
+  medir(); quieto ? dibujar() : paso();
+  let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { medir(); dibujar(); }, 150); });
+})();
+</script>
+
+</body>
+</html>
